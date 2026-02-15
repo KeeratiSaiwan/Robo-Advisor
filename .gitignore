@@ -22,3 +22,8 @@ Thumbs.db
 # Project
 _demo_inputs.txt
 *.pyc
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/

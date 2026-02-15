@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import Dict
 
 import pandas as pd
@@ -60,6 +61,16 @@ def run_backtest(
 
     if initial_capital <= 0:
         raise ValueError("initial_capital must be greater than 0.")
+
+    total_weight = sum(allocation.values())
+    if not math.isclose(total_weight, 1.0, rel_tol=1e-9, abs_tol=1e-9):
+        raise ValueError(f"Allocation must sum to 1.0, but got {total_weight}.")
+
+    if rebalance_frequency is not None:
+        if not isinstance(rebalance_frequency, int) or rebalance_frequency < 1:
+            raise ValueError(
+                "rebalance_frequency must be None or a positive integer."
+            )
 
     allowed = set(monthly_returns.columns)
     for ticker in allocation:

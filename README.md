@@ -48,9 +48,10 @@ Backend ของระบบ Robo-Advisor: risk profiling, portfolio model, tra
 - Python 3.x
 - **yfinance** (Yahoo Finance)
 - **pandas** (backtest และ market_data)
+- **pytest**, **pytest-cov** (สำหรับ unit tests)
 
 ```bash
-pip install yfinance pandas
+pip install -r requirements.txt
 ```
 
 ## การรัน
@@ -79,3 +80,29 @@ Flow:
 6. **Running Backtest** – โหลดข้อมูลย้อนหลัง (ช่วงที่กำหนดใน runner) → รัน backtest → แสดง report (Performance Summary, Key Insight, Monthly ล่าสุด 12 เดือน)
 
 ผลลัพธ์ report แสดง Final Value, Total Return, CAGR, Max Drawdown, Best/Worst Year และ monthly return 12 เดือนล่าสุด
+
+## Automated Testing
+
+เทสเฉพาะ pure logic (ไม่เทส CLI / print). ใช้ mock data ไม่เรียก API จริง
+
+```bash
+pytest -v
+```
+
+วัด coverage (เป้าหมาย ≥ 80%):
+
+```bash
+pytest --cov=risk_profiling --cov=backtest_engine --cov=portfolio --cov=trading --cov=capital_input --cov-report=term-missing
+```
+
+โครงสร้างเทส:
+
+| ไฟล์ | ครอบคลุม |
+|------|----------|
+| `tests/test_risk_profiling.py` | get_allocation, allocation sum, high/moderate/low, invalid level |
+| `tests/test_backtest_engine.py` | run_backtest return keys, initial_capital > 0, rebalance None/12, allocation sum, validation |
+| `tests/test_portfolio.py` | init_portfolio, buy, sell, calculate_portfolio_value, get_current_allocation, validation |
+| `tests/test_rebalancing.py` | rebalance_frequency None/6/12, invalid frequency |
+| `tests/test_trading_engine.py` | execute_trade (mock get_price), allocation sum, zero cash |
+| `tests/test_utils.py` | parse_initial_cash (comma, strip, invalid, zero) |
+| `tests/conftest.py` | fixtures: sample_allocation, mock_monthly_returns, sample_portfolio |
